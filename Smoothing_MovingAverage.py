@@ -1,37 +1,37 @@
-# 1. 导入必要的库
+# 1. Import necessary libraries
 import pandas as pd
 import numpy as np
 import os
 import matplotlib
 import matplotlib.pyplot as plt
-from google.colab import files  # 导入 Colab 文件处理库
+from google.colab import files  # Import Colab file processing library
 
-# 2. 数据处理与绘图函数
+# 2. Data processing and plotting functions
 
 def moving_average(data, window_size):
-    """应用移动平均法平滑数据"""
+    """Apply moving average method to smooth data"""
     if len(data) < window_size:
         raise ValueError("Data length must be greater than or equal to the window size.")
     return np.convolve(data, np.ones(window_size) / window_size, mode='same')
 
 def calculate_and_plot_angles(df, scorer, title, plot_filename, csv_filename):
     """
-    一个辅助函数，用于从给定的 DataFrame 计算角度、保存 CSV 并绘图。
-    :param df: 输入的 DataFrame (可以是原始的，也可以是平滑后的)
-    :param scorer: DLC scorer 的名称
-    :param title: 图表的标题
-    :param plot_filename: 输出的图片文件名
-    :param csv_filename: 输出的 CSV 文件名
-    :return: 生成的 [csv_filename, plot_filename] 列表
+    A helper function to calculate angles from given DataFrame, save CSV and create plots.
+    :param df: Input DataFrame (can be original or smoothed)
+    :param scorer: Name of the DLC scorer
+    :param title: Title of the chart
+    :param plot_filename: Output image filename
+    :param csv_filename: Output CSV filename
+    :return: Generated [csv_filename, plot_filename] list
     """
     print(f"\n--- Processing for: {title} ---")
     
-    # ---- 角度计算 ----
+    # ---- Angle calculation ----
     left_y_math = 1342 - df[(scorer, 'Left', 'y')]
     middle_y_math = 1342 - df[(scorer, 'Middle', 'y')]
     right_y_math = 1342 - df[(scorer, 'Right', 'y')]
     
-    # 使用 .copy() 避免 SettingWithCopyWarning
+    # Use .copy() to avoid SettingWithCopyWarning
     df_calc = df.copy()
     df_calc['left_dx'] = abs(df[(scorer, 'Left', 'x')] - df[(scorer, 'Middle', 'x')])
     df_calc['right_dx'] = abs(df[(scorer, 'Right', 'x')] - df[(scorer, 'Middle', 'x')])
@@ -51,11 +51,11 @@ def calculate_and_plot_angles(df, scorer, title, plot_filename, csv_filename):
         'right_angle_deg': right_angle_deg
     })
 
-    # 保存角度结果为 CSV 文件
+    # Save angle results as CSV file
     result.to_csv(csv_filename, index=False)
     print(f"Angle results saved to {csv_filename}")
 
-    # --- 绘图部分 ---
+    # --- Plotting section ---
     plt.figure(figsize=(12, 6))
     plt.plot(result['Frame'].values, result['left_angle_deg'].values, label="Left Angle (deg)", color="blue", linewidth=1.5)
     plt.plot(result['Frame'].values, result['right_angle_deg'].values, label="Right Angle (deg)", color="red", linewidth=1.5)
@@ -63,7 +63,7 @@ def calculate_and_plot_angles(df, scorer, title, plot_filename, csv_filename):
     plt.xlabel("Frame", fontsize=14)
     plt.ylabel("Angle (deg)", fontsize=14)
     plt.axhline(0, color="black", linestyle="--", linewidth=1)
-    # 扩大Y轴范围以便观察噪声
+    # Expand Y-axis range to observe noise
     plt.ylim(-10, 10)
     plt.legend(fontsize=12)
     plt.grid(True)
@@ -71,16 +71,16 @@ def calculate_and_plot_angles(df, scorer, title, plot_filename, csv_filename):
 
     plt.savefig(plot_filename)
     print(f"Angle plot saved to {plot_filename}")
-    plt.show() # 在 Colab 中显示图片
+    plt.show() # Display image in Colab
     
     return [csv_filename, plot_filename]
 
 
 def process_h5_file(input_file, output_file, window_size=21):
     """
-    主函数：读取 H5，执行平滑，并调用绘图函数分别处理平滑前后的数据。
+    Main function: Read H5, perform smoothing, and call plotting function to process data before and after smoothing.
     """
-    # 读取 h5 文件
+    # Read h5 file
     print(f"Reading data from {input_file}...")
     original_data = pd.read_hdf(input_file)
 
@@ -89,13 +89,13 @@ def process_h5_file(input_file, output_file, window_size=21):
 
     scorer = original_data.columns.levels[0][0]
     
-    # --- 关键修改：在这里先处理平滑前的数据 ---
+    # --- Key modification: Process data before smoothing here first ---
     base_name = os.path.splitext(output_file)[0]
     plot_file_before = f"{base_name}_angles_BEFORE_smoothing.png"
     csv_file_before = f"{base_name}_angles_BEFORE_smoothing.csv"
     files_before = calculate_and_plot_angles(original_data, scorer, "Angles Before Smoothing", plot_file_before, csv_file_before)
 
-    # --- 执行平滑处理 ---
+    # --- Perform smoothing process ---
     print("\n--- Applying moving average for smoothing ---")
     keypoints = original_data.columns.levels[1]
     coordinates = original_data.columns.levels[2]
@@ -116,19 +116,19 @@ def process_h5_file(input_file, output_file, window_size=21):
     smoothed_data.to_hdf(output_file, key="df", mode="w")
     print("Processing complete!")
 
-    # --- 关键修改：在这里处理平滑后的数据 ---
+    # --- Key modification: Process data after smoothing here ---
     plot_file_after = f"{base_name}_angles_AFTER_smoothing.png"
     csv_file_after = f"{base_name}_angles_AFTER_smoothing.csv"
     files_after = calculate_and_plot_angles(smoothed_data, scorer, f"Angles After Smoothing (Window Size = {window_size})", plot_file_after, csv_file_after)
     
-    # 返回所有生成的文件名
+    # Return all generated filenames
     return [output_file] + files_before + files_after
 
 # -----------------------------------------------------
-# 主执行流程
+# Main execution flow
 # -----------------------------------------------------
 
-# 3. 上传文件
+# 3. Upload file
 print("Please upload your H5 file...")
 uploaded = files.upload()
 
@@ -138,14 +138,14 @@ else:
     input_h5_file = next(iter(uploaded))
     print(f"\nSuccessfully uploaded: {input_h5_file}")
 
-    # 4. 定义输出文件名
+    # 4. Define output filename
     base_name = os.path.splitext(input_h5_file)[0]
     output_h5_file = f"{base_name}_output.h5"
 
-    # 5. 调用主函数进行处理和绘图
+    # 5. Call main function for processing and plotting
     generated_files = process_h5_file(input_h5_file, output_h5_file)
 
-    # 6. 下载所有生成的结果文件
+    # 6. Download all generated result files
     print("\nDownloading your result files...")
     for f in generated_files:
         files.download(f)

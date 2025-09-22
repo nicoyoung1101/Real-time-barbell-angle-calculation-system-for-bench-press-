@@ -1,6 +1,6 @@
-This study proposes a method for analyzing benchpress movements in powerlifting. By utilizing DeepLabCut, the motion of the barbell is tracked and analyzed from a frontal
-perspective, enabling a quantitative evaluation of form accuracy.Specifically, the position and tilt angle of the barbell are estimated and visualized based on video data. In the experimental phase,
-differences in movement were assessed based on body composition and gender. The proposed method for analyzing bench pressmovements in powerlifting demonstrates its potential to provide
+<h2 align="center">Bench Press Motion Analysis (Powerlifting)</h2>
+This study proposes a method for analyzing bench press movements in powerlifting using DeepLabCut. From a frontal video, the barbell’s path (trajectory) and tilt angle are automatically tracked and visualized, enabling quantitative evaluation of form accuracy. In the experimental phase, movement differences were assessed across groups stratified by body composition and gender. The results demonstrate the method’s potential to support objective technique assessment and training feedback.
 
-<table> <tr> <td align="center"> <video src="[media/video1.mp4](https://github.com/user-attachments/assets/dbc17beb-35b5-49b1-9ccf-2ede8cda2968)" width="360" controls muted playsinline></video> <br><sub>Video 1: Raw Bench Press</sub> </td> <td align="center"> <video src="[media/video2.mp4](https://github.com/user-attachments/assets/fe2d2e4c-9913-49ed-aaaf-6cae461c0a18)" width="360" controls muted playsinline></video> <br><sub>Video 2: Angle / Path Overlay</sub> </td> </tr> </table>
 
+Demo (Animated GIFs for README)
+<p align="center"> <img src="https://github.com/user-attachments/assets/5bd78126-43f2-4e15-b42c-9e47628deaa5" width="430" alt="Video1"> <img src="https://github.com/user-attachments/assets/3bdfe7b2-a50c-476c-9fd3-22d88f10b1d9" width="430" alt="Video2"> </p>

@@ -3,5 +3,6 @@ perspective, enabling a quantitative evaluation of form accuracy.Specifically, t
 differences in movement were assessed based on body composition and gender. The proposed method for analyzing bench pressmovements in powerlifting demonstrates its potential to provide
 
 
-https://github.com/user-attachments/assets/998315a3-0c5d-479e-bd70-de994055b65d
+![Video1](https://github.com/user-attachments/assets/dbc17beb-35b5-49b1-9ccf-2ede8cda2968)
+
 

@@ -3,47 +3,47 @@ import numpy as np
 
 def analyze_barbell_angles(input_file, video_height=1342):
     """
-    分析杠铃杆角度数据
+    Analyze barbell angle data
     
-    参数:
-    input_file: h5文件路径
-    video_height: 视频高度，默认1342但不影响相对角度计算
+    Parameters:
+    input_file: h5 file path
+    video_height: video height, default 1342 but doesn't affect relative angle calculation
     
-    返回:
-    包含左右角度统计信息的字典
+    Returns:
+    Dictionary containing left and right angle statistics
     """
     try:
-        # 读取 h5 文件
+        # Read h5 file
         print(f"Reading data from {input_file}...")
         data = pd.read_hdf(input_file)
 
-        # 检查是否为多级索引
+        # Check if it has MultiIndex structure
         if not isinstance(data.columns, pd.MultiIndex):
             raise ValueError("Input H5 file does not have a MultiIndex structure!")
 
-        # 提取索引层次
-        scorer = data.columns.levels[0][0]  # 假设只有一个 scorer
+        # Extract index levels
+        scorer = data.columns.levels[0][0]  # Assume there's only one scorer
         
-        # 创建DataFrame的副本以避免警告
+        # Create a copy of DataFrame to avoid warnings
         df = data.copy()
 
-        # 转换Y坐标到数学坐标系统
+        # Convert Y coordinates to mathematical coordinate system
         left_y_math = video_height - df[(scorer, 'Left', 'y')]
         middle_y_math = video_height - df[(scorer, 'Middle', 'y')]
         right_y_math = video_height - df[(scorer, 'Right', 'y')]
 
-        # 计算相对于中点的dx和dy
+        # Calculate dx and dy relative to the midpoint
         df['left_dx'] = abs(df[(scorer, 'Left', 'x')] - df[(scorer, 'Middle', 'x')])
         df['right_dx'] = abs(df[(scorer, 'Right', 'x')] - df[(scorer, 'Middle', 'x')])
 
         df['left_dy'] = left_y_math - middle_y_math
         df['right_dy'] = right_y_math - middle_y_math
 
-        # 计算角度
+        # Calculate angles
         df['left_angle_deg'] = np.degrees(np.arctan(df['left_dy'] / df['left_dx']))
         df['right_angle_deg'] = np.degrees(np.arctan(df['right_dy'] / df['right_dx']))
 
-        # 计算统计值
+        # Calculate statistics
         stats = {
             'left_angle_mean': round(df['left_angle_deg'].mean(), 2),
             'left_angle_std': round(df['left_angle_deg'].std(), 2),
@@ -61,7 +61,7 @@ def analyze_barbell_angles(input_file, video_height=1342):
         print(f"Error processing file: {str(e)}")
         return None
 
-# 使用示例
+# Usage example
 if __name__ == "__main__":
-    input_file = "/Users/a/Desktop/ゼミ用Folder/BarTracking_Videos/TestVideo/TestObject_2.h5"  # 替换为你的h5文件路径
+    input_file = "/Users/a/Desktop/ゼミ用Folder/BarTracking_Videos/TestVideo/TestObject_2.h5"  # Replace with your h5 file path
     results = analyze_barbell_angles(input_file)
